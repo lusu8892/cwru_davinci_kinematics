@@ -23,7 +23,8 @@
 
 #include <cwru_davinci_kinematics/davinci_fwd_kinematics.h>
 
-
+#include <urdf/model.h>
+#include <kdl/chainiksolver.hpp>
 
 namespace davinci_kinematics
 {
@@ -82,11 +83,37 @@ public:
     return err_r_;
   }
 
+  /**
+   *  @brief Initialize the solver by providing a urdf::Model and a root and tip name.
+   *
+   *  @param A urdf::Model representation of the PR2 robot model
+   *
+   *  @param The root joint name of the arm
+   *
+   *  @param The tip joint name of the arm
+   *  
+   *  @return true if initialization was successful, false otherwise.
+   */
+  bool init(const urdf::Model &robot_model, const std::string &root_name, const std::string &tip_name);
+
+  /**
+   * @brief get chain information about the arm. This populates the IK query response,
+   * filling in joint level information including names and joint limits.
+   *
+   * @param The response structure to be filled in.
+   */
+  void getSolverInfo(moveit_msgs::KinematicSolverInfo &info);
+
+  /**
+   * @brief get chain information about the arm.
+   */
+  moveit_msgs::KinematicSolverInfo solver_info_;
+
 private:
   /**
    * @brief verifies that the proposed list of joint positions fit the hardware joint limits.
    *
-   * @param qvec A modifiable vector of joint angles. 
+   * @param qvec A modifiable vector of joint angles.
    *
    * @return true if the joints are within the hardware limits.
    */

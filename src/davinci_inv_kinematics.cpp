@@ -338,6 +338,22 @@ int Inverse::ik_solve(Eigen::Affine3d const& desired_hand_pose)
   return -7;
 }
 
+bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name, const std::string &tip_name)
+{
+  std::vector<urdf::Pose> link_offset;
+  int num_joints = 0;
+  boost::shared_ptr<const urdf::Link> link = robot_model.getLink(tip_name);
+
+  while(link && num_joints < 7)  // This condition is when failed to load robot_model
+  {
+    boost::shared_ptr<const urdf::Joint> joint;
+    if(link->parent_joint)
+    {
+      joint = robot_model.getJoint(link->parent_joint->name);
+    }
+  }
+}
+
 Eigen::Vector3d Inverse::compute_fk_wrist(Eigen::Vector3d q123)
 {
   Eigen::Affine3d affine_frame_wrt_base;
