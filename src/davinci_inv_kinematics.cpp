@@ -344,14 +344,128 @@ bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name,
   int num_joints = 0;
   boost::shared_ptr<const urdf::Link> link = robot_model.getLink(tip_name);
 
-  while(link && num_joints < 7)  // This condition is when failed to load robot_model
+  while (link && num_joints < 7)
   {
     boost::shared_ptr<const urdf::Joint> joint;
-    if(link->parent_joint)
+    if (link->parent_joint)
     {
-      joint = robot_model.getJoint(link->parent_joint->name);
+      joint = robot_model.getJoint(link->parent_joint->name);  // get joint by name
+    }
+    if (!joint)
+    {
+      if (link->parent_joint)
+      {
+        ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
+      }
+      else
+      {
+        ROS_ERROR("Link %s has no parent joint",link->name.c_str());
+      }
+      return false;
+    }
+    if (joint->type != urdf::joint::UNKNOWN && joint-> != urdf::Joint::FIXED)
+    {
+      link_offset.push_back(link->parent_joint->parent_to_joint_origin_transform);
+      angle_multipliers_.push_back(joint->axis.x*fabs(joint->axis.x) +  joint->axis.y*fabs(joint->axis.y) +  joint->axis.z*fabs(joint->axis.z));
+      ROS_DEBUG("Joint axis: %d, %f, %f, %f",6-num_joints,joint->axis.x,joint->axis.y,joint->axis.z);  // TODO magic number
+      if (joint->type != urdf::Joint::CONTINUOUS)
+      {
+        if (joint->safety)
+        {
+          min_angles_.push_back(joint->safety->soft_lower_limit);
+          max_angles_.push_back(joint->safety->soft_upper_limit);
+        }
+        else
+        {
+          if (joint->limits)
+          {
+            min_angles_.push_back(joint->limits->lower);
+            max_angles_.push_back(joint->limits->upper);
+          }
+          else
+          {
+            min_angles_.push_back(0.0);
+            max_angles_.push_back(0.0);
+            ROS_WARN("No joint limits or joint '%s'",joint->name.c_str());
+          }
+        }
+        continuous_joint_.push_back(false);
+      }
+      else
+      {
+        min_angles_.push_back(-M_PI);  // TODO why -M_PI
+        max_angles_.push_back(M_PI);  // TODO why M_PI
+        continuous_joint_.push_back(true);
+      }
+
+      addJointToChainInfo(link->parent_joint, solver_info_);
+      num_joints++;
+    }
+
+    link = robot_model.getLink(link->getParent()->name);
+  }
+
+  solver_info_.link_names.push_back(tip_name);
+
+    // We expect order from root to tip, so reverse the order
+  std::reverse(angle_multipliers_.begin(),angle_multipliers_.end());
+  std::reverse(min_angles_.begin(),min_angles_.end());
+  std::reverse(max_angles_.begin(),max_angles_.end());
+  std::reverse(link_offset.begin(),link_offset.end());
+  std::reverse(solver_info_.limits.begin(),solver_info_.limits.end());
+  std::reverse(solver_info_.joint_names.begin(),solver_info_.joint_names.end());
+  std::reverse(solver_info_.link_names.begin(),solver_info_.link_names.end());
+  std::reverse(continuous_joint_.begin(),continuous_joint_.end());
+}
+
+void Inverse::getSolverInfo(moveit_msgs::KinematicSolverInfo &info)
+{
+  info = solver_info_;
+}
+
+void Inverse::addJointToChainInfo(boost::shared_ptr<const urdf::Joint> joint, moveit_msgs::KinematicSolverInfo & info)
+{
+  moveit_msgs::JointLimits limit;
+  info.joint_names.push_back(joint->name);  // Joints are coming in reverse order
+
+  if (joint->type != urdf::Joint::CONTINUOUS)
+  {
+    if (joint->safety)
+    {
+      limit.min_position = joint->safety->soft_lower_limit;  // Parameters for Joint Safety Controllers
+      limit.max_position = joint->safety->soft_upper_limit;
+      limit.has_position_limits = true;
+    }
+    else
+    {
+      if (joint->limits)
+      {
+        limit.min_position = joint->limits->lower;  // Parameters for Joint Safety Controllers
+        limit.max_position = joint->limits->upper;
+        limit.has_position_limits = true;
+      }
+      else
+      {
+        limit.has_position_limits = false;
+      }
     }
   }
+  else  // if joint->type is CONTINUOUS
+  {
+    limit.min_position = -M_PI;  // TODO
+    limit.max_position = M_PI;  // TODO
+    limit.has_position_limits = false;
+  }
+  if (joint->limits)
+  {
+    limit.max_velocity = joint->limits->velocity;
+    limit.has_velocity_limits = true;
+  }
+  else
+  {
+    limit.has_velocity_limits = 0;
+  }
+  info.limits.push_back(limit);  // limits is of type moveit_msgs/JointLimits[], which a list of joint limits corresponding to the joint names
 }
 
 Eigen::Vector3d Inverse::compute_fk_wrist(Eigen::Vector3d q123)

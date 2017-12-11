@@ -195,6 +195,23 @@ private:
 
   double err_l_;
   double err_r_;
+
+  void addJointToChainInfo(boost::shared_ptr<const urdf::Joint> joint, moveit_msgs::KinematicSolverInfo & info);
+
+  /**
+   * @brief get chain information about the arm.
+   */
+  moveit_msgs::KinematicSolverInfo solver_info_;
+
+  std::vector<double> angle_multipliers_;  // TODO don't know what's this yet
+
+  std::vector<double> min_angles_;  // TODO
+
+  std::vector<double> max_angles_;  // TODO
+
+  std::vector<bool> continuous_joint_;  // TODO
+
+
 };
 
 }  // namespace davinci_kinematics
