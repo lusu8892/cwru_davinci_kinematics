@@ -211,6 +211,7 @@ private:
 
   std::vector<bool> continuous_joint_;  // TODO
 
+  Eigen::Matrix4f grhs_, gf_, home_inv_, home_;  // TODO
 
 };
 

@@ -407,7 +407,7 @@ bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name,
 
   solver_info_.link_names.push_back(tip_name);
 
-    // We expect order from root to tip, so reverse the order
+  // We expect order from root to tip, so reverse the order
   std::reverse(angle_multipliers_.begin(),angle_multipliers_.end());
   std::reverse(min_angles_.begin(),min_angles_.end());
   std::reverse(max_angles_.begin(),max_angles_.end());
@@ -416,6 +416,31 @@ bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name,
   std::reverse(solver_info_.joint_names.begin(),solver_info_.joint_names.end());
   std::reverse(solver_info_.link_names.begin(),solver_info_.link_names.end());
   std::reverse(continuous_joint_.begin(),continuous_joint_.end());
+
+  if(num_joints != 7)
+  {
+    ROS_FATAL("daVinciPSMIK:: Chain from %s to %s does not have 7 joints", root.name.c_str(), tip_name.c_str());
+    return false;
+  }
+
+  // TODO not sure what are these offsets used for.
+  torso_shoulder_offset_x_ = link_offset[0].position.x;
+  torso_shoulder_offset_y_ = link_offset[0].position.y;
+  torso_shoulder_offset_z_ = link_offset[0].position.z;
+  shoulder_upperarm_offset_ = distance(link_offset[1]);
+  upperarm_elbow_offset_ = distance(link_offset[3]);
+  elbow_wrist_offset_ = distance(link_offset[5]);
+  shoulder_elbow_offset_ = shoulder_upperarm_offset_ + upperarm_elbow_offset_;
+  shoulder_wrist_offset_ = shoulder_upperarm_offset_+upperarm_elbow_offset_+elbow_wrist_offset_;
+
+  // Define a home pose
+  Eigen::Matrix4f home = Eigen::Matrix4f::Identity();
+  home(0,3) = shoulder_upperarm_offset_ +  upperarm_elbow_offset_ +  elbow_wrist_offset_;
+  home_inv_ = home.inverse();  // TODO
+  grhs_ = home;  // TODO
+  gf_ = home_inv_;  // TODO
+  solution_.resize(davinci_kinematics::NUM_JOINTS_ARM7DOF);
+  return true;
 }
 
 void Inverse::getSolverInfo(moveit_msgs::KinematicSolverInfo &info)

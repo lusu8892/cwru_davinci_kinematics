@@ -28,6 +28,12 @@ extern const double dist_from_wrist_bend_axis_to_gripper_jaw_rot_axis;
 extern const double gripper_jaw_length;
 
 /**
+ * @brief This is the number of DOF that davinci PSM has
+extern const int NUM_JOINTS_ARM7DOF;
+
+extern const double IK_EPS;
+
+/**
  * @brief This is the list of Denavit–Hartenberg (DH) parameters which are often used for robot kinematic chains.
  * 
  * For further information about DH parameters, please consult https://en.wikipedia.org/wiki/Denavit%E2%80%93Hartenberg_parameters

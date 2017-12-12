@@ -106,32 +106,37 @@ const double dist_from_wrist_bend_axis_to_gripper_jaw_rot_axis = 0.0091;
 
 const double gripper_jaw_length = 0.0102;
 
-const double DH_a_params[7] =
+
+extern const int NUM_JOINTS_ARM7DOF = 7;
+
+extern const double IK_EPS = 1e-5;
+
+const double DH_a_params[NUM_JOINTS_ARM7DOF] =
 {
   DH_a1, DH_a2, DH_a3, DH_a4, DH_a5, DH_a6, DH_a7
 };
 
-const double DH_d_params[7] =
+const double DH_d_params[NUM_JOINTS_ARM7DOF] =
 {
   DH_d1, DH_d2, DH_d3, DH_d4, DH_d5, DH_d6, DH_d7
 };
 
-const double DH_alpha_params[7] =
+const double DH_alpha_params[NUM_JOINTS_ARM7DOF] =
 {
   DH_alpha1, DH_alpha2, DH_alpha3, DH_alpha4, DH_alpha5, DH_alpha6, DH_alpha7
 };
 
-const double DH_q_offsets[7] =
+const double DH_q_offsets[NUM_JOINTS_ARM7DOF] =
 {
   DH_q_offset0, DH_q_offset1, DH_q_offset2, DH_q_offset3, DH_q_offset4, DH_q_offset5, DH_q_offset6
 };
 
-const double q_lower_limits[7] =
+const double q_lower_limits[NUM_JOINTS_ARM7DOF] =
 {
   DH_q_min0, DH_q_min1, DH_q_min2, DH_q_min3, DH_q_min4, DH_q_min5, DH_q_min6
 };
 
-const double q_upper_limits[7] =
+const double q_upper_limits[NUM_JOINTS_ARM7DOF] =
 {
   DH_q_max0, DH_q_max1, DH_q_max2, DH_q_max3, DH_q_max4, DH_q_max5, DH_q_max6
 };
