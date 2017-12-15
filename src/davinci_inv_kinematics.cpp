@@ -443,6 +443,20 @@ bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name,
   return true;
 }
 
+void computeIKSolution(const Eigen::Affine3d &g_in,
+                         std::vector<double> &solution) const
+{
+  solution.clear();
+  solution.resize(davinci_kinematics::NUM_JOINTS_ARM7DOF, 0.0);
+  ik_solve(g_in);
+  Vectorq7x1 q_vec_soln = get_soln();
+  for (int i = 0; i < davinci_kinematics::NUM_JOINTS_ARM7DOF, i++)
+  {
+    solution.push_back(q_vec_soln(i));
+  }
+}
+
+
 void Inverse::getSolverInfo(moveit_msgs::KinematicSolverInfo &info)
 {
   info = solver_info_;

@@ -84,17 +84,36 @@ public:
   }
 
   /**
-   *  @brief Initialize the solver by providing a urdf::Model and a root and tip name.
+   * TODO
+   */
+
+  /**
+   * @brief Initialize the solver by providing a urdf::Model and a root and tip name.
    *
-   *  @param A urdf::Model representation of the PR2 robot model
+   * @param A urdf::Model representation of the PR2 robot model
    *
-   *  @param The root joint name of the arm
+   * @param The root joint name of the arm
    *
-   *  @param The tip joint name of the arm
-   *  
-   *  @return true if initialization was successful, false otherwise.
+   * @param The tip joint name of the arm
+   *
+   * @return true if initialization was successful, false otherwise.
    */
   bool init(const urdf::Model &robot_model, const std::string &root_name, const std::string &tip_name);
+
+  /**
+   * TODO
+   */
+
+  /**
+   * @brief compute IK solution.
+   * @param Input pose for end-effector
+   */
+  void computeIKSolution(const Eigen::Affine3d &g_in,
+                         std::vector<double> &solution) const;
+
+  /**
+   * TODO
+   */
 
   /**
    * @brief get chain information about the arm. This populates the IK query response,
@@ -103,6 +122,10 @@ public:
    * @param The response structure to be filled in.
    */
   void getSolverInfo(moveit_msgs::KinematicSolverInfo &info);
+
+  /**
+   * TODO
+   */
 
   /**
    * @brief get chain information about the arm.
@@ -196,6 +219,9 @@ private:
   double err_l_;
   double err_r_;
 
+  /**
+   * TODO
+   */
   void addJointToChainInfo(boost::shared_ptr<const urdf::Joint> joint, moveit_msgs::KinematicSolverInfo & info);
 
   /**
@@ -211,7 +237,7 @@ private:
 
   std::vector<bool> continuous_joint_;  // TODO
 
-  Eigen::Matrix4f grhs_, gf_, home_inv_, home_;  // TODO
+  Eigen::Affine3d grhs_, gf_, home_inv_, home_;  // TODO
 
 };
 

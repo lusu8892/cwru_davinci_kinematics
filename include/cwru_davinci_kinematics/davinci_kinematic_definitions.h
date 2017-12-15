@@ -29,6 +29,7 @@ extern const double gripper_jaw_length;
 
 /**
  * @brief This is the number of DOF that davinci PSM has
+ */
 extern const int NUM_JOINTS_ARM7DOF;
 
 extern const double IK_EPS;
