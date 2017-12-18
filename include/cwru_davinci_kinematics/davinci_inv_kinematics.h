@@ -225,6 +225,11 @@ private:
   void addJointToChainInfo(boost::shared_ptr<const urdf::Joint> joint, moveit_msgs::KinematicSolverInfo & info);
 
   /**
+   * TODO
+   */
+  void convertVectorq7x1ToStdVector(const Vectorq7x1& vec_in, std::vector<double>& vec_out);
+
+  /**
    * @brief get chain information about the arm.
    */
   moveit_msgs::KinematicSolverInfo solver_info_;
