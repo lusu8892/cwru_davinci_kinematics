@@ -227,7 +227,7 @@ private:
   /**
    * TODO
    */
-  void convertVectorq7x1ToStdVector(const Vectorq7x1& vec_in, std::vector<double>& vec_out);
+  void convertVectorq7x1ToStdVector(const Vectorq7x1& vec_in, std::vector<double>& vec_out) const;
 
   /**
    * @brief get chain information about the arm.

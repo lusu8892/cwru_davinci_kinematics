@@ -444,7 +444,7 @@ bool Inverse::init(const urdf::Model &robot_model, const std::string &root_name,
 }
 
 void computeIKSolution(const Eigen::Affine3d &g_in,
-                       std::vector<std::vector<double>> &solution) const
+                       std::vector<double> &solution) const
 {
   solution.clear();
 
@@ -454,28 +454,15 @@ void computeIKSolution(const Eigen::Affine3d &g_in,
   {
     case -6 :
     {
-      return;
+      break;
     }
     case 1 :
     {
       std::vector<double> solution_ik;
       convertVectorq7x1ToStdVector(get_soln(), solution_ik);
       solution.push_back(solution_ik);
-      return;
+      break;
     }
-    default:
-    {
-
-    }
-  }
-
-  solution.clear();
-  solution.resize(davinci_kinematics::NUM_JOINTS_ARM7DOF, 0.0);
-  ik_solve(g_in);
-  Vectorq7x1 q_vec_soln = get_soln();
-  for (int i = 0; i < davinci_kinematics::NUM_JOINTS_ARM7DOF, i++)
-  {
-    solution.push_back(q_vec_soln(i));
   }
 }
 
@@ -530,7 +517,7 @@ void Inverse::addJointToChainInfo(boost::shared_ptr<const urdf::Joint> joint, mo
   info.limits.push_back(limit);  // limits is of type moveit_msgs/JointLimits[], which a list of joint limits corresponding to the joint names
 }
 
-void Inverse::convertVectorq7x1ToStdVector(const Vectorq7x1& vec_in, std::vector<double>& vec_out)
+void Inverse::convertVectorq7x1ToStdVector(const Vectorq7x1& vec_in, std::vector<double>& vec_out) const
 {
   vec_out.clear();
   vec_out.resize(davinci_kinematics::NUM_JOINTS_ARM7DOF, 0.0);
